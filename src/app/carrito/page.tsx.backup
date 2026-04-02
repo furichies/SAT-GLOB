@@ -1,0 +1,492 @@
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
+import { Label } from '@/components/ui/label'
+import {
+  Trash2,
+  ShoppingBag,
+  Truck,
+  Shield,
+  ArrowRight,
+  Minus,
+  Plus,
+  CreditCard,
+  User
+} from 'lucide-react'
+import Image from 'next/image'
+
+// Mock data para demostración
+const carritoItemsMock = [
+  {
+    id: '1',
+    producto: {
+      id: '1',
+      nombre: 'Portátil Gaming Pro X15',
+      descripcionCorta: 'Intel Core i7-13700H, RTX 4070, 32GB RAM DDR5',
+      precio: 1499,
+      precioOferta: 1299,
+      stock: 5,
+      marca: 'Asus',
+      modelo: 'ROG Strix G15',
+      valoracion: 4.8,
+      totalValoraciones: 124,
+      imagen: '/images/producto_laptop_gaming.png',
+      imagenes: ['/images/producto_laptop_gaming.png']
+    },
+    cantidad: 1
+  },
+  {
+    id: '2',
+    producto: {
+      id: '3',
+      nombre: 'Memoria RAM DDR5 32GB Corsair',
+      descripcionCorta: '6000MHz CL36 RGB, baja latencia para gaming',
+      precio: 129.99,
+      precioOferta: 109.99,
+      stock: 15,
+      marca: 'Corsair',
+      modelo: 'Vengeance DDR5',
+      valoracion: 4.7,
+      totalValoraciones: 203,
+      imagen: '/images/producto_ram.png',
+      imagenes: ['/images/producto_ram.png']
+    },
+    cantidad: 2
+  },
+  {
+    id: '3',
+    producto: {
+      id: '5',
+      nombre: 'Monitor Curvo 32" 4K Samsung',
+      descripcionCorta: '165Hz, 1ms, HDR10+, AMD FreeSync Premium Pro',
+      precio: 549.99,
+      precioOferta: 479.99,
+      stock: 8,
+      marca: 'Samsung',
+      modelo: 'Odyssey G7',
+      valoracion: 4.6,
+      totalValoraciones: 92,
+      imagen: '/images/producto_monitor.png',
+      imagenes: ['/images/producto_monitor.png']
+    },
+    cantidad: 1
+  }
+]
+
+const gastosEnvio = {
+  standard: 0,
+  express: 9.99,
+  premium: 19.99
+}
+
+const impuestoIVA = 0.21 // 21% en España
+
+export default function CarritoPage() {
+  const router = useRouter()
+  const [items, setItems] = useState(carritoItemsMock)
+  const [metodoEnvio, setMetodoEnvio] = useState<'standard' | 'express' | 'premium'>('standard')
+  
+  // Datos de envío para usuario no autenticado
+  const [datosEnvio, setDatosEnvio] = useState({
+    nombre: '',
+    apellidos: '',
+    direccion: '',
+    codigoPostal: '',
+    ciudad: '',
+    provincia: '',
+    telefono: ''
+  })
+
+  const subtotal = items.reduce((acc, item) => {
+    return acc + ((item.producto.precioOferta || item.producto.precio) * item.cantidad)
+  }, 0)
+
+  const iva = subtotal * impuestoIVA
+  const gastosEnvioPrecio = gastosEnvio[metodoEnvio]
+  const total = subtotal + iva + gastosEnvioPrecio
+
+  const actualizarCantidad = (itemId: string, nuevaCantidad: number) => {
+    setItems(items.map(item =>
+      item.id === itemId
+        ? { ...item, cantidad: Math.max(1, nuevaCantidad) }
+        : item
+    ))
+  }
+
+  const incrementarCantidad = (itemId: string) => {
+    const item = items.find(i => i.id === itemId)
+    if (item) {
+      actualizarCantidad(itemId, item.cantidad + 1)
+    }
+  }
+
+  const decrementarCantidad = (itemId: string) => {
+    const item = items.find(i => i.id === itemId)
+    if (item && item.cantidad > 1) {
+      actualizarCantidad(itemId, item.cantidad - 1)
+    }
+  }
+
+  const eliminarItem = (itemId: string) => {
+    setItems(items.filter(item => item.id !== itemId))
+  }
+
+  const finalizarCompra = () => {
+    if (items.length === 0) return
+    
+    // Aquí se conectará con la API de pedidos
+    console.log('Finalizando compra:', {
+      items,
+      subtotal,
+      iva,
+      gastosEnvio: gastosEnvioPrecio,
+      total,
+      metodoEnvio,
+      datosEnvio
+    })
+    
+    // Redirigir a página de checkout/pago
+    router.push('/checkout')
+  }
+
+  const carritoVacio = items.length === 0
+
+  return (
+    <div className="min-h-screen py-8 bg-muted/30">
+      <div className="container">
+        {/* Header de carrito */}
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Carrito de Compras</h1>
+            <p className="text-muted-foreground">
+              {items.length} {items.length === 1 ? 'producto' : 'productos'}
+            </p>
+          </div>
+          <Button variant="outline" onClick={() => router.push('/tienda')}>
+            <ShoppingBag className="h-4 w-4 mr-2" />
+            Seguir Comprando
+          </Button>
+        </div>
+
+        {carritoVacio ? (
+          <Card className="max-w-md mx-auto">
+            <CardContent className="pt-12 pb-12 text-center">
+              <ShoppingBag className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+              <h2 className="text-2xl font-bold mb-2">Tu carrito está vacío</h2>
+              <p className="text-muted-foreground mb-6">
+                Añade productos a tu carrito para continuar con la compra.
+              </p>
+              <Button size="lg" onClick={() => router.push('/tienda')}>
+                <ArrowRight className="h-5 w-5 mr-2" />
+                Ir a la Tienda
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Columna Izquierda: Lista de productos */}
+            <div className="lg:col-span-2 space-y-4">
+              {items.map((item) => (
+                <Card key={item.id} className="hover:shadow-lg transition-all">
+                  <CardContent className="p-6">
+                    <div className="flex gap-6">
+                      {/* Imagen del producto */}
+                      <div className="w-24 h-24 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        <Image
+                          src={item.producto.imagen}
+                          alt={item.producto.nombre}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+
+                      {/* Detalles del producto */}
+                      <div className="flex-1 min-w-0 space-y-3">
+                        <div className="flex items-start justify-between">
+                          <Link href={`/producto/${item.producto.id}`} className="flex-1">
+                            <h3 className="font-semibold text-base hover:text-primary transition-colors line-clamp-2">
+                              {item.producto.nombre}
+                            </h3>
+                          </Link>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => eliminarItem(item.id)}
+                            className="text-destructive hover:text-destructive/80"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {item.producto.descripcionCorta}
+                        </p>
+                        
+                        {/* Precio */}
+                        <div className="flex items-end gap-3">
+                          <div>
+                            {item.producto.precioOferta ? (
+                              <>
+                                <span className="text-2xl font-bold text-destructive">
+                                  {item.producto.precioOferta.toFixed(2)}€
+                                </span>
+                                <span className="text-sm text-muted-foreground line-through ml-2">
+                                  {item.producto.precio.toFixed(2)}€
+                                </span>
+                              </>
+                            ) : (
+                              <span className="text-2xl font-bold">
+                                {item.producto.precio.toFixed(2)}€
+                              </span>
+                            )}
+                          </div>
+                          <Badge variant={item.producto.stock < 10 ? "outline" : "default"} className="border-destructive text-destructive">
+                            {item.producto.stock} disponibles
+                          </Badge>
+                        </div>
+
+                        {/* Gestión de cantidad */}
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm text-muted-foreground">Cantidad:</span>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => decrementarCantidad(item.id)}
+                              disabled={item.cantidad <= 1}
+                            >
+                              <Minus className="h-4 w-4" />
+                            </Button>
+                            <span className="text-lg font-semibold w-12 text-center">
+                              {item.cantidad}
+                            </span>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => incrementarCantidad(item.id)}
+                              disabled={item.cantidad >= item.producto.stock}
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Subtotal del item */}
+                        <div className="flex items-center justify-between pt-3 border-t">
+                          <span className="text-sm text-muted-foreground">Subtotal:</span>
+                          <span className="text-xl font-bold">
+                            {((item.producto.precioOferta || item.producto.precio) * item.cantidad).toFixed(2)}€
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Columna Derecha: Resumen del pedido */}
+            <div className="space-y-6">
+              {/* Resumen de pedido */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Resumen del Pedido</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Subtotal */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span className="text-lg font-semibold">{subtotal.toFixed(2)}€</span>
+                  </div>
+
+                  {/* IVA */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">IVA (21%)</span>
+                    <span className="text-lg font-semibold">{iva.toFixed(2)}€</span>
+                  </div>
+
+                  {/* Gastos de envío */}
+                  <div className="space-y-3">
+                    <span className="text-sm font-medium">Método de envío</span>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:bg-accent transition-colors"
+                           onClick={() => setMetodoEnvio('standard')}>
+                        <div className="flex items-center gap-2">
+                          <Truck className="h-4 w-4" />
+                          <span className="flex-1">Estándar (3-5 días)</span>
+                        </div>
+                        <span className="font-semibold">{gastosEnvio.standard === 0 ? 'Gratis' : `${gastosEnvio.standard.toFixed(2)}€`}</span>
+                      </div>
+                      <div className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-colors ${
+                        metodoEnvio === 'express' ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'
+                      }`} onClick={() => setMetodoEnvio('express')}>
+                        <div className="flex items-center gap-2">
+                          <Truck className="h-4 w-4" />
+                          <span className="flex-1">Express (24-48h)</span>
+                        </div>
+                        <span className="font-semibold">{gastosEnvio.express.toFixed(2)}€</span>
+                      </div>
+                      <div className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-colors ${
+                        metodoEnvio === 'premium' ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'
+                      }`} onClick={() => setMetodoEnvio('premium')}>
+                        <div className="flex items-center gap-2">
+                          <Truck className="h-4 w-4" />
+                          <span className="flex-1">Premium (24h)</span>
+                        </div>
+                        <span className="font-semibold">{gastosEnvio.premium.toFixed(2)}€</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between pt-2">
+                      <span className="text-sm text-muted-foreground">Envío:</span>
+                      <span className="text-lg font-semibold">{gastosEnvioPrecio.toFixed(2)}€</span>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Total */}
+                  <div className="flex items-center justify-between pt-2">
+                    <span className="text-2xl font-bold">Total</span>
+                    <span className="text-3xl font-bold text-primary">{total.toFixed(2)}€</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Datos de envío para usuario no autenticado */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Truck className="h-5 w-5" />
+                    Datos de Envío
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="nombre">Nombre *</Label>
+                      <Input
+                        id="nombre"
+                        placeholder="Tu nombre"
+                        value={datosEnvio.nombre}
+                        onChange={(e) => setDatosEnvio({...datosEnvio, nombre: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="apellidos">Apellidos *</Label>
+                      <Input
+                        id="apellidos"
+                        placeholder="Tus apellidos"
+                        value={datosEnvio.apellidos}
+                        onChange={(e) => setDatosEnvio({...datosEnvio, apellidos: e.target.value})}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="direccion">Dirección *</Label>
+                    <Input
+                      id="direccion"
+                      placeholder="Calle y número"
+                      value={datosEnvio.direccion}
+                      onChange={(e) => setDatosEnvio({...datosEnvio, direccion: e.target.value})}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="codigoPostal">Código Postal *</Label>
+                      <Input
+                        id="codigoPostal"
+                        placeholder="CP"
+                        value={datosEnvio.codigoPostal}
+                        onChange={(e) => setDatosEnvio({...datosEnvio, codigoPostal: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="ciudad">Ciudad *</Label>
+                      <Input
+                        id="ciudad"
+                        placeholder="Ciudad"
+                        value={datosEnvio.ciudad}
+                        onChange={(e) => setDatosEnvio({...datosEnvio, ciudad: e.target.value})}
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="provincia">Provincia *</Label>
+                      <Input
+                        id="provincia"
+                        placeholder="Provincia"
+                        value={datosEnvio.provincia}
+                        onChange={(e) => setDatosEnvio({...datosEnvio, provincia: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="telefono">Teléfono *</Label>
+                      <Input
+                        id="telefono"
+                        placeholder="+34 600 00 00 00"
+                        value={datosEnvio.telefono}
+                        onChange={(e) => setDatosEnvio({...datosEnvio, telefono: e.target.value})}
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Información adicional */}
+              <Card>
+                <CardContent className="pt-6 space-y-4">
+                  <div className="flex items-start gap-3 text-sm">
+                    <Shield className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                    <div>
+                      <p className="font-semibold mb-1">Compra Segura</p>
+                      <p className="text-muted-foreground">
+                        Todos los pedidos cuentan con garantía oficial de 2 años en equipos y 1 año en componentes.
+                      </p>
+                    </div>
+                  </div>
+                  <Separator />
+                  <div className="flex items-start gap-3 text-sm">
+                    <Truck className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                    <div>
+                      <p className="font-semibold mb-1">Envío Gratis</p>
+                      <p className="text-muted-foreground">
+                        Pedidos superiores a 199€ tienen envío estándar gratuito.
+                      </p>
+                    </div>
+                  </div>
+                  <Separator />
+                  <div className="flex items-start gap-3 text-sm">
+                    <CreditCard className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                    <div>
+                      <p className="font-semibold mb-1">Métodos de Pago</p>
+                      <p className="text-muted-foreground">
+                        Aceptamos tarjeta, PayPal, transferencia y contrareembolso.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Botón de finalizar compra */}
+              <Button
+                size="lg"
+                className="w-full"
+                onClick={finalizarCompra}
+                disabled={items.length === 0}
+              >
+                <ArrowRight className="h-5 w-5 mr-2" />
+                Finalizar Compra
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

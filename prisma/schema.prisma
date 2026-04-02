@@ -1,0 +1,429 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Usuario {
+  id            String              @id @default(cuid())
+  email         String              @unique
+  passwordHash  String
+  nombre        String
+  apellidos     String?
+  telefono      String?
+  direccion     String?
+  codigoPostal  String?
+  ciudad        String?
+  provincia     String?
+  rol           UserRole            @default(cliente)
+  activo        Boolean             @default(true)
+  fechaRegistro DateTime            @default(now())
+  ultimoAcceso  DateTime?
+  dni           String?             @unique
+  conocimiento  BaseConocimiento[]
+  carritoItems  Carrito[]
+  documentos    Documento[]
+  pedidos       Pedido[]
+  seguimientos  SeguimientoTicket[]
+  tecnico       Tecnico?
+  tickets       Ticket[]
+  valoraciones  Valoracion[]
+
+  @@index([email])
+  @@index([rol])
+  @@index([activo])
+}
+
+model Categoria {
+  id                 String      @id @default(cuid())
+  nombre             String
+  descripcion        String?
+  imagenUrl          String?
+  categoriaPadreId   String?
+  orden              Int         @default(0)
+  activa             Boolean     @default(true)
+  fechaCreacion      DateTime    @default(now())
+  fechaActualizacion DateTime    @updatedAt
+  categoriaPadre     Categoria?  @relation("CategoriaRelacion", fields: [categoriaPadreId], references: [id])
+  subcategorias      Categoria[] @relation("CategoriaRelacion")
+  productos          Producto[]
+
+  @@index([categoriaPadreId])
+  @@index([activa])
+}
+
+model Producto {
+  id                 String             @id @default(cuid())
+  sku                String             @unique
+  nombre             String
+  descripcion        String?
+  descripcionCorta   String?
+  precio             Float
+  precioOferta       Float?
+  stock              Int                @default(0)
+  stockMinimo        Int                @default(5)
+  categoriaId        String?
+  marca              String?
+  modelo             String?
+  tipo               ProductoTipo
+  especificaciones   String?
+  imagenes           String?
+  peso               Float?
+  dimensiones        String?
+  garantiaMeses      Int                @default(24)
+  activo             Boolean            @default(true)
+  destacado          Boolean            @default(false)
+  fechaCreacion      DateTime           @default(now())
+  fechaActualizacion DateTime           @updatedAt
+  conocimiento       BaseConocimiento[]
+  carritoItems       Carrito[]
+  pedidoDetalles     DetallePedido[]
+  documentos         Documento[]
+  categoria          Categoria?         @relation(fields: [categoriaId], references: [id])
+  tickets            Ticket[]
+  valoraciones       Valoracion[]
+
+  @@index([categoriaId])
+  @@index([tipo])
+  @@index([activo])
+  @@index([destacado])
+}
+
+model Pedido {
+  id             String          @id @default(cuid())
+  numeroPedido   String          @unique
+  usuarioId      String
+  estado         PedidoEstado    @default(pendiente)
+  subtotal       Float
+  iva            Float
+  gastosEnvio    Float           @default(0)
+  total          Float
+  direccionEnvio String
+  metodoPago     MetodoPago
+  referenciaPago String?
+  notas          String?
+  fechaPedido    DateTime        @default(now())
+  fechaEnvio     DateTime?
+  fechaEntrega   DateTime?
+  detalles       DetallePedido[]
+  documentos     Documento[]
+  usuario        Usuario         @relation(fields: [usuarioId], references: [id])
+  tickets        Ticket[]
+  valoraciones   Valoracion[]
+
+  @@index([usuarioId])
+  @@index([estado])
+  @@index([numeroPedido])
+}
+
+model DetallePedido {
+  id             String   @id @default(cuid())
+  pedidoId       String
+  productoId     String
+  cantidad       Int
+  precioUnitario Float
+  descuento      Float    @default(0)
+  subtotal       Float
+  descripcion    String?
+  pedido         Pedido   @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  producto       Producto @relation(fields: [productoId], references: [id])
+
+  @@index([pedidoId])
+  @@index([productoId])
+}
+
+model Tecnico {
+  id                 String       @id @default(cuid())
+  usuarioId          String       @unique
+  especialidades     String?
+  nivel              TecnicoNivel @default(junior)
+  disponible         Boolean      @default(true)
+  ticketsAsignados   Int          @default(0)
+  ticketsResueltos   Int          @default(0)
+  valoracionMedia    Float        @default(0)
+  fechaIncorporacion DateTime?
+  fechaCreacion      DateTime     @default(now())
+  usuario            Usuario      @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  tickets            Ticket[]
+
+  @@index([usuarioId])
+  @@index([disponible])
+}
+
+model Ticket {
+  id                  String              @id @default(cuid())
+  numeroTicket        String              @unique
+  usuarioId           String
+  tecnicoId           String?
+  pedidoId            String?
+  productoId          String?
+  tipo                TicketTipo
+  prioridad           TicketPrioridad     @default(media)
+  estado              TicketEstado        @default(abierto)
+  asunto              String
+  descripcion         String
+  numeroSerieProducto String?
+  diagnostico         String?
+  solucion            String?
+  tiempoEstimado      Int?
+  tiempoReal          Int?
+  costeReparacion     Float?
+  fechaCreacion       DateTime            @default(now())
+  fechaAsignacion     DateTime?
+  fechaResolucion     DateTime?
+  fechaCierre         DateTime?
+  satisfaccion        Int?
+  resolucionId        String?
+  documentos          Documento[]
+  seguimientos        SeguimientoTicket[]
+  usuario             Usuario             @relation(fields: [usuarioId], references: [id])
+  resolucion          BaseConocimiento?   @relation(fields: [resolucionId], references: [id])
+  tecnico             Tecnico?            @relation(fields: [tecnicoId], references: [id])
+  pedido              Pedido?             @relation(fields: [pedidoId], references: [id])
+  producto            Producto?           @relation(fields: [productoId], references: [id])
+
+  @@index([usuarioId])
+  @@index([tecnicoId])
+  @@index([resolucionId])
+  @@index([estado])
+  @@index([prioridad])
+  @@index([numeroTicket])
+}
+
+model SeguimientoTicket {
+  id            String          @id @default(cuid())
+  ticketId      String
+  usuarioId     String
+  tipo          SeguimientoTipo
+  contenido     String
+  esInterno     Boolean         @default(false)
+  adjuntos      String?
+  fechaCreacion DateTime        @default(now())
+  ticket        Ticket          @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  usuario       Usuario         @relation(fields: [usuarioId], references: [id])
+
+  @@index([ticketId])
+}
+
+model BaseConocimiento {
+  id                    String           @id @default(cuid())
+  titulo                String
+  contenido             String
+  categoria             String?
+  etiquetas             String?
+  tipo                  ConocimientoTipo
+  productoRelacionadoId String?
+  autorId               String
+  vistas                Int              @default(0)
+  utilSi                Int              @default(0)
+  utilNo                Int              @default(0)
+  activo                Boolean          @default(true)
+  fechaCreacion         DateTime         @default(now())
+  fechaActualizacion    DateTime         @updatedAt
+  productoRelacionado   Producto?        @relation(fields: [productoRelacionadoId], references: [id])
+  autor                 Usuario          @relation(fields: [autorId], references: [id])
+  ticketsResueltos      Ticket[]
+
+  @@index([categoria])
+  @@index([tipo])
+  @@index([activo])
+}
+
+model Documento {
+  id                     String               @id @default(cuid())
+  tipo                   DocumentoTipo
+  numeroDocumento        String               @unique
+  entidadTipo            DocumentoEntidadTipo
+  ticketId               String?
+  pedidoId               String?
+  productoId             String?
+  usuarioGeneradorId     String
+  contenido              String?
+  rutaArchivo            String?
+  fechaGeneracion        DateTime             @default(now())
+  metadatos              String?
+  estadoDocumento        EstadoDocumento      @default(borrador)
+  firmaCliente           String?
+  firmaTecnico           String?
+  evidenciasFotos        String?
+  fechaVencimiento       DateTime?
+  fechaFirma             DateTime?
+  fechaEnvio             DateTime?
+  documentoRelacionadoId String?
+  usuarioGenerador       Usuario              @relation(fields: [usuarioGeneradorId], references: [id])
+  producto               Producto?            @relation(fields: [productoId], references: [id], onDelete: Cascade)
+  pedido                 Pedido?              @relation(fields: [pedidoId], references: [id], onDelete: Restrict)
+  ticket                 Ticket?              @relation(fields: [ticketId], references: [id], onDelete: Restrict)
+  documentoRelacionado   Documento?           @relation("DocumentoRelacion", fields: [documentoRelacionadoId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  documentosHijos        Documento[]          @relation("DocumentoRelacion")
+
+  @@index([ticketId])
+  @@index([pedidoId])
+  @@index([productoId])
+  @@index([tipo])
+  @@index([estadoDocumento])
+  @@index([documentoRelacionadoId])
+}
+
+model Carrito {
+  id            String   @id @default(cuid())
+  usuarioId     String?
+  sessionId     String?
+  productoId    String
+  cantidad      Int      @default(1)
+  fechaAgregado DateTime @default(now())
+  usuario       Usuario? @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  producto      Producto @relation(fields: [productoId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+  @@index([sessionId])
+  @@index([productoId])
+}
+
+model Valoracion {
+  id            String   @id @default(cuid())
+  productoId    String
+  usuarioId     String
+  pedidoId      String?
+  puntuacion    Int
+  titulo        String?
+  comentario    String?
+  verificada    Boolean  @default(false)
+  fechaCreacion DateTime @default(now())
+  producto      Producto @relation(fields: [productoId], references: [id], onDelete: Cascade)
+  usuario       Usuario  @relation(fields: [usuarioId], references: [id])
+  pedido        Pedido?  @relation(fields: [pedidoId], references: [id])
+
+  @@unique([productoId, usuarioId, pedidoId])
+  @@index([productoId])
+  @@index([usuarioId])
+  @@index([pedidoId])
+}
+
+enum UserRole {
+  cliente
+  tecnico
+  admin
+  superadmin
+}
+
+enum PedidoEstado {
+  pendiente
+  confirmado
+  procesando
+  enviado
+  entregado
+  cancelado
+  devuelto
+}
+
+enum MetodoPago {
+  tarjeta
+  paypal
+  transferencia
+  contrareembolso
+}
+
+enum TecnicoNivel {
+  junior
+  senior
+  experto
+}
+
+enum TicketTipo {
+  incidencia
+  consulta
+  reparacion
+  garantia
+  devolucion
+  otro
+}
+
+enum TicketPrioridad {
+  baja
+  media
+  alta
+  urgente
+}
+
+enum TicketEstado {
+  abierto
+  asignado
+  en_progreso
+  pendiente_cliente
+  pendiente_pieza
+  resuelto
+  cerrado
+  cancelado
+}
+
+enum SeguimientoTipo {
+  comentario
+  cambio_estado
+  asignacion
+  nota_interna
+  adjunto
+}
+
+enum ConocimientoTipo {
+  solucion
+  procedimiento
+  faq
+  manual
+  tutorial
+}
+
+enum DocumentoTipo {
+  factura
+  albaran
+  presupuesto
+  informe_reparacion
+  garantia
+  manual
+  orden_servicio
+  diagnostico_presupuesto
+  aceptacion_presupuesto
+  rechazo_presupuesto
+  extension_presupuesto
+  aceptacion_extension
+  orden_trabajo_interna
+  hoja_ruta
+  albaran_entrega
+  orden_intervencion
+  informe_mantenimiento
+  acta_instalacion
+  informe_entrega
+  autorizacion_acceso_remoto
+  encuesta_satisfaccion
+  informe_mantenimiento_preventivo
+  acta_instalacion_configuracion
+}
+
+enum EstadoDocumento {
+  borrador
+  pendiente_firma
+  firmado
+  enviado
+  aceptado
+  rechazado
+  vencido
+  anulado
+}
+
+enum DocumentoEntidadTipo {
+  pedido
+  ticket
+  producto
+}
+
+enum ProductoTipo {
+  equipo_completo
+  componente
+  periferico
+  accesorio
+  software
+}
