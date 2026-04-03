@@ -4,6 +4,8 @@ import { db } from '@/lib/db'
 // GET /api/productos - Listar productos desde la base de datos real
 export async function GET(req: NextRequest) {
   try {
+    console.log('[API] Starting productos query...')
+    
     const { searchParams } = new URL(req.url)
     const busqueda = searchParams.get('busqueda') || ''
     const categoriaId = searchParams.get('categoria') || ''
@@ -60,12 +62,13 @@ export async function GET(req: NextRequest) {
         orderBy = { nombre: 'asc' }
         break
       case 'valoracion':
-        // Por ahora usamos destacado como proxy de valoración
         orderBy = { destacado: 'desc' }
         break
       default:
         orderBy = { fechaCreacion: 'desc' }
     }
+
+    console.log('[API] Querying database with where:', JSON.stringify(where))
 
     const [productos, totalItems] = await Promise.all([
       db.producto.findMany({
@@ -76,6 +79,8 @@ export async function GET(req: NextRequest) {
       }),
       db.producto.count({ where })
     ])
+
+    console.log('[API] Found productos:', productos.length, 'total:', totalItems)
 
     const totalPages = Math.ceil(totalItems / porPagina)
 
@@ -96,9 +101,14 @@ export async function GET(req: NextRequest) {
         }
       }
     })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error en GET /api/productos:', error)
-    return NextResponse.json({ success: false, error: 'Error al obtener productos' }, { status: 500 })
+    console.error('Stack:', error.stack)
+    return NextResponse.json({ 
+      success: false, 
+      error: 'Error al obtener productos',
+      details: error.message 
+    }, { status: 500 })
   }
 }
 
