@@ -3,20 +3,17 @@ import { NextResponse } from 'next/server'
 
 export default withAuth(
   function middleware(req) {
-    const token = req.nextauth.token
-    const path = req.nextUrl.pathname
+    const role = req.nextauth.token?.role as string
     
-    console.log('[Middleware] Path:', path, 'Token role:', token?.role)
+    if (role !== 'admin' && role !== 'tecnico' && role !== 'superadmin') {
+      return NextResponse.redirect(new URL('/', req.url))
+    }
     
-    // Allow access to /admin but let the layout handle the role check
     return NextResponse.next()
   },
   {
     callbacks: {
-      authorized: ({ token }) => {
-        console.log('[Middleware] Authorized:', !!token)
-        return !!token
-      },
+      authorized: ({ token }) => !!token,
     },
     pages: {
       signIn: '/auth/login',
