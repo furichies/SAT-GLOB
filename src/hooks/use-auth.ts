@@ -1,13 +1,9 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
-import { UserRole } from '@prisma/client'
 
 export function useAuth() {
   const { data: session, status, update } = useSession()
-
-  console.log('[useAuth] Session:', session)
-  console.log('[useAuth] Status:', status)
 
   return {
     user: session?.user,
@@ -18,20 +14,16 @@ export function useAuth() {
   }
 }
 
-export function useHasRole(role: UserRole) {
+export function useHasRole(role: string) {
   const { user, isLoading } = useAuth()
-  console.log('[useHasRole] user:', user, 'role:', role)
   return {
     hasRole: user?.role === role,
     isLoading
   }
 }
 
-export function useHasAnyRole(roles: UserRole[]) {
+export function useHasAnyRole(roles: string[]) {
   const { user, isLoading } = useAuth()
-  console.log('[useHasAnyRole] user:', user, 'roles:', roles)
-  console.log('[useHasAnyRole] user?.role:', user?.role)
-  console.log('[useHasAnyRole] includes:', user?.role ? roles.includes(user.role) : false)
   return {
     hasAnyRole: user?.role ? roles.includes(user.role) : false,
     isLoading
@@ -39,17 +31,17 @@ export function useHasAnyRole(roles: UserRole[]) {
 }
 
 export function useIsAdmin() {
-  return useHasAnyRole([UserRole.admin, UserRole.superadmin])
+  return useHasAnyRole(['admin', 'superadmin'])
 }
 
 export function useIsStaff() {
-  return useHasAnyRole([UserRole.tecnico, UserRole.admin, UserRole.superadmin])
+  return useHasAnyRole(['tecnico', 'admin', 'superadmin'])
 }
 
 export function useIsCliente() {
-  return useHasRole(UserRole.cliente)
+  return useHasRole('cliente')
 }
 
 export function useIsTecnico() {
-  return useHasRole(UserRole.tecnico)
+  return useHasRole('tecnico')
 }
