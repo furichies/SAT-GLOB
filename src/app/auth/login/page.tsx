@@ -15,8 +15,8 @@ import { signIn, useSession } from 'next-auth/react'
 export default function LoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { data: session } = useSession()
-  const callbackUrl = searchParams.get('callbackUrl') || '/'
+  const { data: session, update } = useSession()
+  const callbackUrl = searchParams.get('callbackUrl') || '/admin/dashboard'
 
   const [formData, setFormData] = useState({
     email: '',
@@ -40,14 +40,17 @@ export default function LoginPage() {
 
       if (result?.ok) {
         setSuccess(true)
-        setTimeout(() => {
-          const userRole = session?.user?.role
+        // Force refresh session and check role
+        await update()
+        setTimeout(async () => {
+          const { data: refreshedSession } = await fetch('/api/auth/session').then(r => r.json())
+          const userRole = refreshedSession?.user?.role
           if (userRole === 'admin' || userRole === 'superadmin' || userRole === 'tecnico') {
             window.location.href = '/admin/dashboard'
           } else {
             window.location.href = callbackUrl
           }
-        }, 1000)
+        }, 500)
       } else {
         setError(result?.error || 'Error al iniciar sesión. Por favor, verifica tus credenciales.')
       }
