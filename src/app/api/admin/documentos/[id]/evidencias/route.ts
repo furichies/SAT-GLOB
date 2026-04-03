@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import path from 'path'
 import { uploadToStorage, getSignedUrl } from '@/lib/supabase-storage'
 
 // POST /api/admin/documentos/[id]/evidencias - Subir evidencias fotográficas
@@ -101,18 +100,6 @@ export async function POST(
             { status: 500 }
         )
     }
-}
-
-// Función helper para obtener URL firmada (evita import circular)
-async function getSignedUrl(bucket: string, path: string, expiresIn: number) {
-    const { createClient } = require('@supabase/supabase-js')
-    const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
-    const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, expiresIn)
-    if (error) throw error
-    return data.signedUrl
 }
 
 // DELETE /api/admin/documentos/[id]/evidencias - Eliminar una evidencia
