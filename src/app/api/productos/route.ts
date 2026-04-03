@@ -12,6 +12,7 @@ export async function GET(req: NextRequest) {
     const tipo = searchParams.get('tipo') || ''
     const enStock = searchParams.get('enStock') === 'true'
     const enOferta = searchParams.get('enOferta') === 'true'
+    const destacado = searchParams.get('destacado') === 'true'
     const ordenar = searchParams.get('ordenar') || 'novedad'
     const precioMax = parseFloat(searchParams.get('precioMax') || '999999')
     const pagina = parseInt(searchParams.get('pagina') || '1')
@@ -47,6 +48,10 @@ export async function GET(req: NextRequest) {
 
     if (enOferta) {
       where.precioOferta = { not: null }
+    }
+
+    if (destacado) {
+      where.destacado = true
     }
 
     // Configurar ordenamiento
