@@ -150,7 +150,7 @@ export default function ConfiguradorPC() {
         // Crear el objeto del pack para el carrito
         const pack = {
             id: configId,
-            nombre: "Configuración Personalizada Micro1475 (Pack)",
+            nombre: "Configuración Personalizada Microinfo (Pack)",
             precio: totalPrice,
             imagen: "/images/categoria_ordenadores.png", // Imagen genérica de PC
             cantidad: 1,
@@ -186,7 +186,7 @@ export default function ConfiguradorPC() {
                             Configura tu <span className="text-primary italic">Máquina</span>
                         </h1>
                         <p className="text-muted-foreground font-medium max-w-sm">
-                            Selecciona componentes certificados por Micro1475. Garantía de compatibilidad total y montaje profesional incluido.
+                            Selecciona componentes certificados por Microinfo. Garantía de compatibilidad total y montaje profesional incluido.
                         </p>
                     </div>
                 </div>
@@ -337,7 +337,7 @@ export default function ConfiguradorPC() {
                                     <div className="p-6 bg-primary/5 rounded-3xl border border-primary/10 space-y-3">
                                         <div className="flex items-center gap-2 text-primary">
                                             <AlertCircle className="h-4 w-4" />
-                                            <span className="text-[10px] font-black uppercase tracking-widest">Sello Micro1475</span>
+                                            <span className="text-[10px] font-black uppercase tracking-widest">Sello Microinfo</span>
                                         </div>
                                         <p className="text-[10px] text-muted-foreground leading-relaxed font-bold uppercase tracking-wider">
                                             Montaje premium, ventilación optimizada y tests de estrés incluidos en el precio.

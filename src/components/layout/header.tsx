@@ -71,7 +71,7 @@ export function Header() {
             <Link href="/" className="relative flex items-center z-50">
               <img
                 src="/logo.png"
-                alt="Micro1475 Logo"
+                alt="Microinfo Logo"
                 className="h-20 w-auto object-contain drop-shadow-2xl transition-transform hover:scale-110 duration-500"
               />
             </Link>

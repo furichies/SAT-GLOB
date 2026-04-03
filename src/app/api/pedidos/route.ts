@@ -103,13 +103,13 @@ export async function POST(req: NextRequest) {
             genericProduct = await tx.producto.create({
               data: {
                 sku: 'CONFIG-CUSTOM',
-                nombre: 'Configuración Personalizada Micro1475',
+                nombre: 'Configuración Personalizada Microinfo',
                 descripcion: 'Pack de componentes configurado a medida por el usuario.',
                 precio: 0,
                 stock: 9999,
                 tipo: 'equipo_completo',
                 activo: true,
-                marca: 'Micro1475',
+                marca: 'Microinfo',
                 modelo: 'Custom Build'
               }
             })

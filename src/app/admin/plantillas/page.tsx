@@ -54,7 +54,7 @@ export default function PlantillasPage() {
         setFormData({
             fecha: new Date().toLocaleDateString('es-ES'),
             horaInicio: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-            empresa: 'Micro1475' // Default based on prompt? Or customizable? Prompt says "en los imprimibles incluiras la información de la empresa Micro1475" which is done in PDF generator, but for filled data...
+            empresa: 'Microinfo' // Default based on prompt? Or customizable? Prompt says "en los imprimibles incluiras la información de la empresa Microinfo" which is done in PDF generator, but for filled data...
         })
         setPdfUrl(null)
     }, [selectedTemplate])

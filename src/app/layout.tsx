@@ -17,10 +17,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Micro1475 - Tienda de Informática y Servicio Técnico",
+  title: "Microinfo - Tienda de Informática y Servicio Técnico",
   description: "Tienda online de informática con servicio técnico especializado. Equipos, componentes, reparaciones y soporte técnico profesional.",
   keywords: ["informática", "ordenadores", "componentes", "reparaciones", "SAT", "servicio técnico"],
-  authors: [{ name: "Micro1475 Team" }],
+  authors: [{ name: "Microinfo Team" }],
   icons: {
     icon: [
       { url: '/icon.png', type: 'image/png' },
@@ -30,13 +30,13 @@ export const metadata: Metadata = {
     apple: '/icon.png',
   },
   openGraph: {
-    title: "Micro1475 - Tienda de Informática y SAT",
+    title: "Microinfo - Tienda de Informática y SAT",
     description: "Tu tienda de confianza para equipos informáticos y servicio técnico",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Micro1475 - Tienda de Informática",
+    title: "Microinfo - Tienda de Informática",
     description: "Equipos, componentes y servicio técnico profesional",
   },
 };

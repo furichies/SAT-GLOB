@@ -1,6 +1,6 @@
-# Documentación de la API - Micro1475
+# Documentación de la API - Microinfo
 
-Esta guía detalla los endpoints principales de la aplicación Micro1475. Todos los endpoints devuelven un objeto JSON con la estructura base `{ success: boolean, data?: any, error?: string }`.
+Esta guía detalla los endpoints principales de la aplicación Microinfo. Todos los endpoints devuelven un objeto JSON con la estructura base `{ success: boolean, data?: any, error?: string }`.
 
 ## 1. Autenticación (`/api/auth`)
 

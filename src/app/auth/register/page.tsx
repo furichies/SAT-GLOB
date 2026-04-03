@@ -85,7 +85,7 @@ export default function RegisterPage() {
         <div className="mb-6 text-center">
           <Link href="/" className="inline-flex items-center gap-2">
             <ShoppingBag className="h-10 w-10 text-primary" />
-            <span className="text-3xl font-bold text-primary">Micro1475</span>
+            <span className="text-3xl font-bold text-primary">Microinfo</span>
           </Link>
         </div>
 
@@ -94,7 +94,7 @@ export default function RegisterPage() {
             <User className="h-12 w-12 text-primary mx-auto mb-4" />
             <CardTitle className="text-2xl">Crear Cuenta</CardTitle>
             <p className="text-sm text-gray-600 mt-2">
-              Únete a Micro1475 y empieza a comprar
+              Únete a Microinfo y empieza a comprar
             </p>
           </CardHeader>
           <CardContent>

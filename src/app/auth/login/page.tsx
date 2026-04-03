@@ -80,7 +80,7 @@ export default function LoginPage() {
         <div className="mb-8 text-center">
           <Link href="/" className="inline-flex items-center gap-2">
             <ShoppingBag className="h-12 w-12 text-primary" />
-            <span className="text-3xl font-bold text-primary">Micro1475</span>
+            <span className="text-3xl font-bold text-primary">Microinfo</span>
           </Link>
         </div>
 

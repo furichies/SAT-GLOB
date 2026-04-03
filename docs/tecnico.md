@@ -1,4 +1,4 @@
-# Manual de Técnico - Micro1475
+# Manual de Técnico - Microinfo
 
 Manual de procedimientos operativos para técnicos de soporte.
 

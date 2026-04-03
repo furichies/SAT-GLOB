@@ -1,6 +1,6 @@
-# Manual de Usuario - Micro1475
+# Manual de Usuario - Microinfo
 
-Bienvenido al manual de usuario de Micro1475. Esta guía te ayudará a navegar por nuestra tienda online y utilizar nuestro sistema de soporte técnico (SAT).
+Bienvenido al manual de usuario de Microinfo. Esta guía te ayudará a navegar por nuestra tienda online y utilizar nuestro sistema de soporte técnico (SAT).
 
 ## 1. Compras en la Tienda Online
 

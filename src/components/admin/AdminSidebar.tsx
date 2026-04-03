@@ -59,7 +59,7 @@ export function AdminSidebar() {
 
             <div className="mt-auto pt-8 border-t">
                 <a
-                    href="https://micro1475.slack.com/"
+                    href="https://microinfo.slack.com/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 px-4 py-2 rounded-lg font-medium text-gray-600 hover:bg-gray-50 hover:text-[#4A154B] transition-colors"

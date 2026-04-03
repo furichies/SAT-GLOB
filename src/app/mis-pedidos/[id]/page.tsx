@@ -85,8 +85,8 @@ export default function DetallePedidoPage() {
 
             // Header - Logo y Título
             doc.setFontSize(22)
-            doc.setTextColor(20, 50, 150) // Azul Micro1475
-            doc.text('MICRO1475 - RESISTENCIA TÉCNICA', 14, 22)
+            doc.setTextColor(20, 50, 150) // Azul Microinfo
+            doc.text('MICROINFO - RESISTENCIA TÉCNICA', 14, 22)
 
             doc.setFontSize(10)
             doc.setTextColor(100)
@@ -171,10 +171,10 @@ export default function DetallePedidoPage() {
             // Pie de página
             doc.setFontSize(8)
             doc.setTextColor(150)
-            doc.text('Gracias por confiar en Micro1475. Este documento sirve como comprobante de compra oficial.', 105, 280, { align: 'center' })
-            doc.text('Micro1475 - Resistencia Técnica ante la Obsolescencia Programada.', 105, 285, { align: 'center' })
+            doc.text('Gracias por confiar en Microinfo. Este documento sirve como comprobante de compra oficial.', 105, 280, { align: 'center' })
+            doc.text('Microinfo - Resistencia Técnica ante la Obsolescencia Programada.', 105, 285, { align: 'center' })
 
-            doc.save(`Factura_Micro1475_${pedido.numeroPedido}.pdf`)
+            doc.save(`Factura_Microinfo_${pedido.numeroPedido}.pdf`)
             toast.success("Factura generada y descargada con éxito")
         } catch (error) {
             console.error("Error generating PDF:", error)

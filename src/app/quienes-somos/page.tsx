@@ -16,7 +16,7 @@ export default function QuienesSomos() {
                 {/* Hero Section */}
                 <div className="text-center mb-20 space-y-6">
                     <Badge variant="outline" className="px-4 py-1 border-primary/30 text-primary bg-primary/5 backdrop-blur-md rounded-full text-sm font-medium tracking-wide">
-                        MICRO1475: RESISTENCIA TÉCNICA
+                        MICROINFO: RESISTENCIA TÉCNICA
                     </Badge>
                     <h1 className="text-6xl md:text-8xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/20 select-none">
                         QUIÉNES SOMOS.
@@ -62,7 +62,7 @@ export default function QuienesSomos() {
                                     <Chip className="h-12 w-12 text-primary mb-6 animate-pulse" />
                                     <h3 className="text-2xl font-black mb-4 tracking-tight uppercase italic">Nuestra Postura</h3>
                                     <p className="text-zinc-400 leading-relaxed mb-6">
-                                        En <strong>Micro1475</strong>, nos declaramos objetores de conciencia ante la política de OpenAI. No nos gusta su monopolio, no nos gustan sus precios y, desde luego, no nos gusta su alergia al hardware que puede durar más de dos años.
+                                        En <strong>Microinfo</strong>, nos declaramos objetores de conciencia ante la política de OpenAI. No nos gusta su monopolio, no nos gustan sus precios y, desde luego, no nos gusta su alergia al hardware que puede durar más de dos años.
                                     </p>
                                     <img
                                         src="/images/resistencia_hardware.png"
@@ -134,7 +134,7 @@ export default function QuienesSomos() {
                     </p>
                     <div className="mt-8 flex justify-center gap-4">
                         <div className="h-px w-12 bg-zinc-800 self-center" />
-                        <span className="text-xs font-black uppercase tracking-[0.3em] text-zinc-600">Micro1475 © 2026</span>
+                        <span className="text-xs font-black uppercase tracking-[0.3em] text-zinc-600">Microinfo © 2026</span>
                         <div className="h-px w-12 bg-zinc-800 self-center" />
                     </div>
                 </div>

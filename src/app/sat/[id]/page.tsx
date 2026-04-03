@@ -311,7 +311,7 @@ export default function TicketDetailPage() {
         // Header
         doc.setFontSize(22)
         doc.setTextColor(0, 48, 135)
-        doc.text('MICRO1475 SAT', 14, 22)
+        doc.text('MICROINFO SAT', 14, 22)
 
         doc.setFontSize(12)
         doc.setTextColor(100)
@@ -422,7 +422,7 @@ export default function TicketDetailPage() {
         const pageHeight = doc.internal.pageSize.height
         doc.setFontSize(8)
         doc.setTextColor(150)
-        doc.text('Micro1475 - Servicio Técnico Profesional', 14, pageHeight - 10)
+        doc.text('Microinfo - Servicio Técnico Profesional', 14, pageHeight - 10)
         doc.text(`Generado el ${new Date().toLocaleString()}`, 150, pageHeight - 10)
 
         // Save PDF

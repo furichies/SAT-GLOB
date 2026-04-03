@@ -1,4 +1,4 @@
-# Manual de Administrador - Micro1475
+# Manual de Administrador - Microinfo
 
 Este manual está dirigido al personal de gestión con permisos de administrador o superadministrador.
 
