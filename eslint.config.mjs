@@ -1,12 +1,10 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const eslintConfig = [
+// eslint.config.mjs - Flat config format
+export default [
   {
-    extends: ["next/core-web-vitals", "next/typescript"],
+    ignores: ["**/node_modules/**", "**/.next/**", "**/dist/**"],
+  },
+  {
+    extends: ["next/core-web-vitals"],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-vars": "off",
@@ -35,5 +33,3 @@ const eslintConfig = [
     },
   },
 ];
-
-export default eslintConfig;
