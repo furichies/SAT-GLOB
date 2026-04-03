@@ -3,10 +3,14 @@ import { NextResponse } from 'next/server'
 
 export default withAuth(
   function middleware(req) {
-    const role = req.nextauth.token?.role as string
+    const token = req.nextauth.token
+    const path = req.nextUrl.pathname
     
-    if (role !== 'admin' && role !== 'superadmin' && role !== 'tecnico') {
-      return NextResponse.redirect(new URL('/', req.url))
+    console.log('[Middleware] Path:', path, 'Has token:', !!token, 'Role:', token?.role)
+    
+    // Just verify user is authenticated, role check is handled in layout
+    if (!token) {
+      return NextResponse.redirect(new URL('/auth/login?callbackUrl=' + path, req.url))
     }
     
     return NextResponse.next()
