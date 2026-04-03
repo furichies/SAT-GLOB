@@ -8,15 +8,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { ShoppingBag, AlertCircle, Lock, ArrowRight } from 'lucide-react'
+import { ShoppingBag, Lock, ArrowRight } from 'lucide-react'
 import { Notification } from '@/components/ui/notification'
-import { signIn, useSession } from 'next-auth/react'
+import { signIn } from 'next-auth/react'
 
 export default function LoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { data: session, update } = useSession()
-  const callbackUrl = searchParams.get('callbackUrl') || '/admin/dashboard'
+  const callbackUrl = searchParams.get('callbackUrl') || '/'
 
   const [formData, setFormData] = useState({
     email: '',
@@ -40,17 +39,9 @@ export default function LoginPage() {
 
       if (result?.ok) {
         setSuccess(true)
-        // Force refresh session and check role
-        await update()
-        setTimeout(async () => {
-          const { data: refreshedSession } = await fetch('/api/auth/session').then(r => r.json())
-          const userRole = refreshedSession?.user?.role
-          if (userRole === 'admin' || userRole === 'superadmin' || userRole === 'tecnico') {
-            window.location.href = '/admin/dashboard'
-          } else {
-            window.location.href = callbackUrl
-          }
-        }, 500)
+        setTimeout(() => {
+          window.location.href = callbackUrl
+        }, 800)
       } else {
         setError(result?.error || 'Error al iniciar sesión. Por favor, verifica tus credenciales.')
       }

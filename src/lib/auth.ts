@@ -35,7 +35,6 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Usuario o contraseña incorrectos')
         }
 
-        // Update last access
         await db.usuario.update({
           where: { id: user.id },
           data: { ultimoAcceso: new Date() }
@@ -52,7 +51,7 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   callbacks: {
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id
         token.role = user.role
@@ -60,11 +59,6 @@ export const authOptions: NextAuthOptions = {
       return token
     },
     async session({ session, token }) {
-      // Si el token está vacío o corrupto, retornar sesión vacía
-      if (!token || !token.id) {
-        return session
-      }
-
       if (session.user) {
         session.user.id = token.id as string
         session.user.role = token.role as UserRole
@@ -72,30 +66,12 @@ export const authOptions: NextAuthOptions = {
       return session
     }
   },
-  events: {
-    async signOut({ token }) {
-      // Limpiar cualquier dato relacionado con la sesión
-      console.log('Usuario desconectado:', token?.id)
-    }
-  },
   pages: {
     signIn: '/auth/login',
-    error: '/auth/error'
   },
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60 // 30 days
-  },
-  cookies: {
-    sessionToken: {
-      name: `next-auth.session-token-sat1475`,
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production' && process.env.NEXTAUTH_URL?.startsWith('https')
-      }
-    }
+    maxAge: 30 * 24 * 60 * 60
   },
   secret: process.env.NEXTAUTH_SECRET
 }
