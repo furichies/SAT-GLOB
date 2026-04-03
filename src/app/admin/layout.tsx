@@ -11,19 +11,25 @@ export default function AdminLayout({
     children: React.ReactNode
 }) {
     const router = useRouter()
-    const { isAuthenticated, isLoading } = useAuth()
+    const { isAuthenticated, isLoading, user } = useAuth()
     const { hasAnyRole: isStaff, isLoading: roleLoading } = useIsStaff()
     const [showRestricted, setShowRestricted] = useState(false)
 
     useEffect(() => {
+        console.log('[AdminLayout] isLoading:', isLoading, 'isAuthenticated:', isAuthenticated, 'isStaff:', isStaff, 'roleLoading:', roleLoading)
+        
         if (!isLoading && !isAuthenticated) {
+            console.log('[AdminLayout] Not authenticated, redirecting to login')
             router.push('/auth/login')
         } else if (!isLoading && isAuthenticated && !roleLoading && !isStaff) {
+            console.log('[AdminLayout] Authenticated but not staff, showing restricted')
             setShowRestricted(true)
             const timer = setTimeout(() => {
                 router.push('/')
             }, 2000)
             return () => clearTimeout(timer)
+        } else if (!isLoading && isAuthenticated && !roleLoading && isStaff) {
+            console.log('[AdminLayout] Authenticated and staff, showing admin panel')
         }
     }, [isAuthenticated, isLoading, isStaff, roleLoading, router])
 
@@ -33,6 +39,8 @@ export default function AdminLayout({
                 <div className="flex flex-col items-center gap-4">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
                     <p className="text-sm font-medium text-gray-500">Verificando credenciales...</p>
+                    <p className="text-xs text-gray-400">isLoading: {String(isLoading)}, roleLoading: {String(roleLoading)}</p>
+                    <p className="text-xs text-gray-400">user: {user ? JSON.stringify(user) : 'null'}</p>
                 </div>
             </div>
         )

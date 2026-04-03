@@ -3,11 +3,11 @@
 import { useSession } from 'next-auth/react'
 import { UserRole } from '@prisma/client'
 
-/**
- * Hook to get current session and user
- */
 export function useAuth() {
   const { data: session, status, update } = useSession()
+
+  console.log('[useAuth] Session:', session)
+  console.log('[useAuth] Status:', status)
 
   return {
     user: session?.user,
@@ -18,52 +18,38 @@ export function useAuth() {
   }
 }
 
-/**
- * Hook to check if user has specific role
- */
 export function useHasRole(role: UserRole) {
   const { user, isLoading } = useAuth()
+  console.log('[useHasRole] user:', user, 'role:', role)
   return {
     hasRole: user?.role === role,
     isLoading
   }
 }
 
-/**
- * Hook to check if user has any of the specified roles
- */
 export function useHasAnyRole(roles: UserRole[]) {
   const { user, isLoading } = useAuth()
+  console.log('[useHasAnyRole] user:', user, 'roles:', roles)
+  console.log('[useHasAnyRole] user?.role:', user?.role)
+  console.log('[useHasAnyRole] includes:', user?.role ? roles.includes(user.role) : false)
   return {
     hasAnyRole: user?.role ? roles.includes(user.role) : false,
     isLoading
   }
 }
 
-/**
- * Hook to check if user is admin or superadmin
- */
 export function useIsAdmin() {
   return useHasAnyRole([UserRole.admin, UserRole.superadmin])
 }
 
-/**
- * Hook to check if user is staff (tecnico, admin or superadmin)
- */
 export function useIsStaff() {
   return useHasAnyRole([UserRole.tecnico, UserRole.admin, UserRole.superadmin])
 }
 
-/**
- * Hook to check if user is cliente
- */
 export function useIsCliente() {
   return useHasRole(UserRole.cliente)
 }
 
-/**
- * Hook to check if user is tecnico
- */
 export function useIsTecnico() {
   return useHasRole(UserRole.tecnico)
 }
