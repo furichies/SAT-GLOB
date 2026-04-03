@@ -353,8 +353,7 @@ async function agregarEvidenciasPDF(
                 continue
             }
 
-            // Determinar formato de imagen
-            let formato = 'JPEG'
+            // Determinar formato de imagen (si no se estableció en Supabase)
             if (imagePath.toLowerCase().includes('.png')) {
                 formato = 'PNG'
             } else if (imagePath.toLowerCase().includes('.gif')) {
