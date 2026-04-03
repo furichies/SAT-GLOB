@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { hash } from 'bcrypt'
+import { hash } from 'bcryptjs'
 
 // POST /api/admin_clientes - Crear nuevo cliente (admin)
 export async function POST(req: NextRequest) {

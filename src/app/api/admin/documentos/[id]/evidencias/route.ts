@@ -2,9 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { writeFile, mkdir } from 'fs/promises'
 import path from 'path'
-import { existsSync } from 'fs'
+import { uploadToStorage, getSignedUrl } from '@/lib/supabase-storage'
 
 // POST /api/admin/documentos/[id]/evidencias - Subir evidencias fotográficas
 export async function POST(
@@ -46,13 +45,6 @@ export async function POST(
             )
         }
 
-        // Crear directorio para evidencias en la carpeta persistente 'uploads'
-        // Esto evita depender de la carpeta 'public' que tiene problemas en standalone mode
-        const uploadDir = path.join(process.cwd(), 'uploads', 'evidencias', id)
-        if (!existsSync(uploadDir)) {
-            await mkdir(uploadDir, { recursive: true })
-        }
-
         // Procesar cada archivo
         const evidencias: any[] = []
         for (const file of files) {
@@ -63,15 +55,17 @@ export async function POST(
             const timestamp = Date.now()
             const extension = file.name.split('.').pop()
             const filename = `evidencia-${timestamp}.${extension}`
-            const filepath = path.join(uploadDir, filename)
 
-            // Guardar archivo
-            await writeFile(filepath, buffer)
+            // Subir a Supabase Storage (bucket privado: evidencias)
+            await uploadToStorage('evidencias', `${id}/${filename}`, buffer)
 
-            // Agregar a la lista de evidencias - USAR RUTA DE API PARA SERVIR
+            // Obtener URL firmada para acceso privado (válida 1 hora)
+            const signedUrl = await getSignedUrl('evidencias', `${id}/${filename}`, 3600)
+
+            // Agregar a la lista de evidencias
             evidencias.push({
                 id: `${timestamp}`,
-                url: `/api/uploads/evidencias/${id}/${filename}`,
+                url: signedUrl,
                 descripcion: descripcion || file.name,
                 fechaCaptura: new Date().toISOString(),
             })
@@ -107,6 +101,18 @@ export async function POST(
             { status: 500 }
         )
     }
+}
+
+// Función helper para obtener URL firmada (evita import circular)
+async function getSignedUrl(bucket: string, path: string, expiresIn: number) {
+    const { createClient } = require('@supabase/supabase-js')
+    const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+    const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, expiresIn)
+    if (error) throw error
+    return data.signedUrl
 }
 
 // DELETE /api/admin/documentos/[id]/evidencias - Eliminar una evidencia

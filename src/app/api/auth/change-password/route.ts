@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { compare, hash } from 'bcrypt'
+import { compare, hash } from 'bcryptjs'
 import { changePasswordSchema } from '@/lib/validations/auth'
 
 export async function POST(req: Request) {

@@ -3,8 +3,6 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { DocumentoTipo, EstadoDocumento, DocumentoEntidadTipo } from '@/types/enums'
-import { writeFile } from 'fs/promises'
-import path from 'path'
 
 // GET /api/admin/documentos - Listar documentos con filtros
 export async function GET(request: NextRequest) {
@@ -186,18 +184,8 @@ export async function POST(request: NextRequest) {
             documentoRelacionadoId,
         } = body
 
-        // LOGGING DEPURACION A ARCHIVO
-        try {
-            const logData = `[${new Date().toISOString()}] POST /api/admin/documentos
-Tipo: ${tipo}
-TicketId Recibido: ${ticketId}
-EntidadTipo: ${entidadTipo}
-Metadatos: ${JSON.stringify(metadatos || {}).substring(0, 200)}...
---------------------------------------------------\n`
-            await writeFile(path.join(process.cwd(), 'documentos-debug.log'), logData, { flag: 'a' })
-        } catch (logErr) {
-            console.error('Error escribiendo log:', logErr)
-        }
+        // LOGGING DEPURACION (usar console.log en lugar de archivo para Vercel)
+        console.log(`[DOCUMENTOS] POST /api/admin/documentos - Tipo: ${tipo}, TicketId: ${ticketId}, EntidadTipo: ${entidadTipo}`)
 
         const session = await getServerSession(authOptions)
         console.log('--- DEBUG POST /api/admin/documentos ---')
@@ -526,10 +514,6 @@ Metadatos: ${JSON.stringify(metadatos || {}).substring(0, 200)}...
         })
     } catch (error) {
         console.error('Error al crear documento:', error)
-        // Log error a archivo también
-        try {
-            await writeFile(path.join(process.cwd(), 'documentos-error.log'), `Error: ${error}\n`, { flag: 'a' })
-        } catch { }
 
         return NextResponse.json(
             { success: false, error: 'Error al crear documento: ' + (error instanceof Error ? error.message : String(error)) },

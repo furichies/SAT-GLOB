@@ -265,28 +265,99 @@ async function agregarEvidenciasPDF(
             // Extraer ruta de archivo de la URL
             let imagePath = evidencia.url
 
-            if (imagePath.startsWith('/api/uploads/')) {
+            // Detectar si es una URL de Supabase Storage
+            if (imagePath.includes('supabase.co')) {
+                // Es una URL de Supabase, descargar desde Storage
+                console.log('[PDF] Descargando imagen desde Supabase Storage:', imagePath)
+                
+        try {
+            let imageData: Buffer | null = null
+            let formato = 'JPEG'
+                    const { createClient } = await import('@supabase/supabase-js')
+                    const supabase = createClient(
+                        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                        process.env.SUPABASE_SERVICE_ROLE_KEY!
+                    )
+                    
+                    // Extraer path relativo del bucket desde la URL
+                    const urlObj = new URL(imagePath)
+                    const pathMatch = urlObj.pathname.match(/storage\/v1\/object\/(?:public|sign)\/([^/]+)\/(.+)/)
+                    
+                    if (pathMatch) {
+                        const bucket = pathMatch[1]
+                        const filePath = pathMatch[2]
+                        
+                        // Descargar el archivo
+                        const { data, error } = await supabase.storage.from(bucket).download(filePath)
+                        
+                        if (error) {
+                            throw new Error(`Supabase download error: ${error.message}`)
+                        }
+                        
+                        const arrayBuffer = await data.arrayBuffer()
+                        imageData = Buffer.from(arrayBuffer)
+                        
+                        // Determinar formato desde la extensión
+                        if (filePath.toLowerCase().includes('.png')) {
+                            formato = 'PNG'
+                        } else if (filePath.toLowerCase().includes('.gif')) {
+                            formato = 'GIF'
+                        } else {
+                            formato = 'JPEG'
+                        }
+                        
+                        console.log('[PDF] Imagen descargada de Supabase, tamaño:', imageData.length, 'bytes')
+                    } else {
+                        // Es una signed URL, intentar descargar directamente
+                        const response = await fetch(imagePath)
+                        if (!response.ok) {
+                            throw new Error(`Failed to fetch image: ${response.status}`)
+                        }
+                        const arrayBuffer = await response.arrayBuffer()
+                        imageData = Buffer.from(arrayBuffer)
+                        formato = 'JPEG'
+                    }
+                } catch (supabaseError: any) {
+                    console.error('[PDF] Error descargando de Supabase:', supabaseError.message)
+                    throw supabaseError
+                }
+            } else if (imagePath.startsWith('/api/uploads/')) {
                 // Convertir ruta de API a ruta del sistema de archivos
                 const pathPart = imagePath.replace('/api/uploads/', '')
                 imagePath = path.join(process.cwd(), 'uploads', pathPart)
+                
+                console.log('[PDF] Leyendo imagen desde:', imagePath)
+                
+                // Importar fs dinámicamente
+                const { readFile } = await import('fs/promises')
+                
+                // Leer archivo directamente del sistema de archivos
+                imageData = await readFile(imagePath)
+                
+                console.log('[PDF] Imagen leída, tamaño:', imageData.length, 'bytes')
             } else if (!imagePath.startsWith('http://') && !imagePath.startsWith('https://')) {
                 // Es otra ruta relativa, intentar resolver desde uploads
                 imagePath = path.join(process.cwd(), 'uploads', imagePath)
+                
+                console.log('[PDF] Leyendo imagen desde:', imagePath)
+                
+                const { readFile } = await import('fs/promises')
+                imageData = await readFile(imagePath)
+            } else {
+                // Es una URL externa HTTP/HTTPS, descargar
+                console.log('[PDF] Descargando imagen externa:', imagePath)
+                const response = await fetch(imagePath)
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch image: ${response.status}`)
+                }
+                const arrayBuffer = await response.arrayBuffer()
+                imageData = Buffer.from(arrayBuffer)
+                formato = 'JPEG'
             }
-
-            console.log('[PDF] Leyendo imagen desde:', imagePath)
-
-            // Importar fs dinámicamente
-            const { readFile } = await import('fs/promises')
-
-            // Leer archivo directamente del sistema de archivos
-            const imageData = await readFile(imagePath)
-
-            console.log('[PDF] Imagen leída, tamaño:', imageData.length, 'bytes')
 
             // Validar tamaño (máximo 4MB)
             if (imageData.length > 4 * 1024 * 1024) {
-                console.warn('[PDF] Imagen excede 4MB, omitiendo:', imagePath)
+                console.warn('[PDF] Imagen excede 4MB, omitiendo')
                 doc.setFontSize(8)
                 doc.setFont('helvetica', 'italic')
                 doc.setTextColor(COLORS.warning)
