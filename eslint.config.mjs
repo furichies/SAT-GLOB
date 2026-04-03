@@ -1,10 +1,10 @@
-// eslint.config.mjs - Flat config format
+// eslint.config.mjs
 export default [
   {
     ignores: ["**/node_modules/**", "**/.next/**", "**/dist/**"],
   },
-  {
-    extends: ["next/core-web-vitals"],
+  ...["next/core-web-vitals"].map((config) => ({
+    extends: [config],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-vars": "off",
@@ -31,5 +31,5 @@ export default [
       "no-unreachable": "off",
       "no-useless-escape": "off",
     },
-  },
+  })),
 ];

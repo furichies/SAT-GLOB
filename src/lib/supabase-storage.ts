@@ -1,9 +1,11 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabaseAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 export async function uploadToStorage(
   bucket: string,
@@ -11,6 +13,7 @@ export async function uploadToStorage(
   file: Buffer | Blob | File,
   contentType?: string
 ) {
+  const supabaseAdmin = getSupabaseAdmin()
   const { data, error } = await supabaseAdmin.storage
     .from(bucket)
     .upload(path, file, { 
@@ -27,6 +30,7 @@ export async function uploadToStorage(
 }
 
 export async function downloadFromStorage(bucket: string, path: string): Promise<Buffer> {
+  const supabaseAdmin = getSupabaseAdmin()
   const { data, error } = await supabaseAdmin.storage
     .from(bucket)
     .download(path)
@@ -41,6 +45,7 @@ export async function downloadFromStorage(bucket: string, path: string): Promise
 }
 
 export function getPublicUrl(bucket: string, path: string): string {
+  const supabaseAdmin = getSupabaseAdmin()
   const { data } = supabaseAdmin.storage.from(bucket).getPublicUrl(path)
   return data.publicUrl
 }
@@ -50,6 +55,7 @@ export async function getSignedUrl(
   path: string, 
   expiresIn: number = 3600
 ) {
+  const supabaseAdmin = getSupabaseAdmin()
   const { data, error } = await supabaseAdmin.storage
     .from(bucket)
     .createSignedUrl(path, expiresIn)
@@ -63,6 +69,7 @@ export async function getSignedUrl(
 }
 
 export async function deleteFromStorage(bucket: string, path: string) {
+  const supabaseAdmin = getSupabaseAdmin()
   const { error } = await supabaseAdmin.storage
     .from(bucket)
     .remove([path])
@@ -74,6 +81,7 @@ export async function deleteFromStorage(bucket: string, path: string) {
 }
 
 export async function listStorageFiles(bucket: string, path: string = '') {
+  const supabaseAdmin = getSupabaseAdmin()
   const { data, error } = await supabaseAdmin.storage
     .from(bucket)
     .list(path, { limit: 1000 })
