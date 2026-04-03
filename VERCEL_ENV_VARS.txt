@@ -1,0 +1,27 @@
+# ============================================
+# VARIABLES DE ENTORNO PARA VERCEL
+# ============================================
+# Copia estos valores en Settings → Environment Variables de tu proyecto en Vercel
+
+# ============================================
+# DATABASE - Supabase Connection Pooler
+# ============================================
+DATABASE_URL=postgresql://postgres.ecljngwkwqvtakfolgct:N1d10sN1am0%24%24%25@aws-1-eu-north-1.pooler.supabase.com:6543/postgres?sslmode=require
+
+# ============================================
+# NEXTAUTH - Autenticación
+# ============================================
+NEXTAUTH_SECRET=3e2c6ff3501eaaa1afc51b9debfbae7eb262bbf7e9d6b7f06b33de6a8524daf2
+NEXTAUTH_URL=https://tu-proyecto.vercel.app
+
+# ============================================
+# SUPABASE - Storage
+# ============================================
+NEXT_PUBLIC_SUPABASE_URL=https://ecljngwkwqvtakfolgct.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjbGpuZ3drd3F2dGFrZm9sZ2N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwNzg1NTQsImV4cCI6MjA5MDY1NDU1NH0.7A4BhUuQFjnM-HUSfAMiNVJ76NVHUjSWt6X3I4eNejI
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjbGpuZ3drd3F2dGFrZm9sZ2N0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTA3ODU1NCwiZXhwIjoyMDkwNjU0NTU0fQ.OplkyO71UYEPoqYkGMUL4S-TEJg8mmND6ZQbqckNBHc
+
+# ============================================
+# ENTORNO
+# ============================================
+NODE_ENV=production
