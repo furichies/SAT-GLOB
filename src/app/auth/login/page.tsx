@@ -10,15 +10,15 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ShoppingBag, AlertCircle, Lock, ArrowRight } from 'lucide-react'
 import { Notification } from '@/components/ui/notification'
-import { signIn } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
 
 export default function LoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { data: session } = useSession()
   const callbackUrl = searchParams.get('callbackUrl') || '/'
 
   const [formData, setFormData] = useState({
-
     email: '',
     password: ''
   })
@@ -38,14 +38,16 @@ export default function LoginPage() {
         redirect: false
       })
 
-      console.log('Login result:', result)
-
       if (result?.ok) {
         setSuccess(true)
-        // Usar window.location para asegurar la redirección
         setTimeout(() => {
-          window.location.href = callbackUrl
-        }, 1500)
+          const userRole = session?.user?.role
+          if (userRole === 'admin' || userRole === 'superadmin' || userRole === 'tecnico') {
+            window.location.href = '/admin/dashboard'
+          } else {
+            window.location.href = callbackUrl
+          }
+        }, 1000)
       } else {
         setError(result?.error || 'Error al iniciar sesión. Por favor, verifica tus credenciales.')
       }
@@ -61,7 +63,7 @@ export default function LoginPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary/10 via-primary/5 to-background flex items-center justify-center p-4">
         <Notification
-          message="¡Login exitoso! Redirigiendo a la página principal..."
+          message="¡Login exitoso! Redirigiendo..."
           type="success"
           duration={2000}
         />
@@ -99,72 +101,61 @@ export default function LoginPage() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email *</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
-                  placeholder="cliente@microinfo.es"
+                  placeholder="tu@email.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
                   disabled={isLoading}
-                  autoComplete="email"
                 />
               </div>
-
               <div className="space-y-2">
-                <Label htmlFor="password">Contraseña *</Label>
+                <Label htmlFor="password">Contraseña</Label>
                 <Input
                   id="password"
+                  name="password"
                   type="password"
-                  placeholder="•••••••"
+                  placeholder="••••••••"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required
-                  minLength={8}
                   disabled={isLoading}
-                  autoComplete="current-password"
                 />
               </div>
-
-              <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="remember"
-                    className="rounded"
-                  />
-                  <span>Recordarme</span>
-                </label>
-                <Link href="/auth/forgot-password" className="text-primary hover:underline">
-                  ¿Olvidaste tu contraseña?
-                </Link>
-              </div>
-
               <Button
                 type="submit"
                 className="w-full"
                 disabled={isLoading}
               >
-                {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+                {isLoading ? (
+                  <span className="flex items-center gap-2">
+                    <span className="animate-spin">⏳</span>
+                    Verificando...
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    Iniciar Sesión
+                    <ArrowRight className="h-4 w-4" />
+                  </span>
+                )}
               </Button>
-
-              <div className="text-center text-sm text-gray-600 mt-4">
-                ¿No tienes cuenta?{' '}
-                <Link href="/auth/register" className="text-primary font-medium hover:underline">
-                  Regístrate aquí
-                </Link>
-              </div>
-
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
-                <h4 className="text-sm font-semibold text-blue-900 mb-2">Usuarios de prueba</h4>
-                <div className="space-y-1 text-xs text-blue-800">
-                  <p><strong>Email:</strong> cliente@microinfo.es</p>
-                  <p><strong>Contraseña:</strong> cliente123</p>
-                  <p className="text-blue-600 mt-1">O prueba con tu propio email</p>
-                </div>
-              </div>
             </form>
+
+            <div className="mt-6 text-center text-sm">
+              <span className="text-gray-600">¿No tienes cuenta? </span>
+              <Link href="/auth/register" className="text-primary hover:underline font-medium">
+                Regístrate
+              </Link>
+            </div>
+
+            <div className="mt-4 text-center text-xs text-gray-500">
+              <p>Cuentas de prueba:</p>
+              <p>Admin: superadmin@microinfo.es / super123</p>
+            </div>
           </CardContent>
         </Card>
       </div>
