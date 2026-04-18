@@ -223,9 +223,25 @@ export default function AdminTecnicosPage() {
     setIsFormModalOpen(true)
   }
 
-  const handleBorrar = (id: string) => {
+  const handleBorrar = async (id: string) => {
     if (confirm('¿Estás seguro de que deseas eliminar este técnico?')) {
-      setTecnicos(tecnicos.filter(t => t.id !== id))
+      setIsLoading(true)
+      try {
+        const res = await fetch(`/api/admin_tecnicos?id=${id}`, {
+          method: 'DELETE'
+        })
+        const data = await res.json()
+        if (data.success) {
+          await fetchTecnicos()
+        } else {
+          alert('Error: ' + data.error)
+          setIsLoading(false)
+        }
+      } catch (error) {
+        console.error('Error al borrar técnico:', error)
+        alert('Error de conexión al borrar')
+        setIsLoading(false)
+      }
     }
   }
 

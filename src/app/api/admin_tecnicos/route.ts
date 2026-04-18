@@ -271,3 +271,62 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ success: false, error: 'Error al actualizar técnico' }, { status: 500 })
   }
 }
+
+// DELETE /api/admin_tecnicos - Eliminar técnico
+export async function DELETE(req: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions)
+    if (!session || (session.user.role !== 'admin' && session.user.role !== 'superadmin')) {
+      return NextResponse.json({ success: false, error: 'No autorizado' }, { status: 401 })
+    }
+
+    const { searchParams } = new URL(req.url)
+    const id = searchParams.get('id')
+
+    if (!id) {
+      return NextResponse.json({ success: false, error: 'ID es requerido' }, { status: 400 })
+    }
+
+    const tecnico = await db.tecnico.findUnique({
+      where: { id },
+      include: { usuario: true }
+    })
+
+    if (!tecnico) {
+      return NextResponse.json({ success: false, error: 'Técnico no encontrado' }, { status: 404 })
+    }
+
+    // Unassign tickets
+    await db.ticket.updateMany({
+      where: { tecnicoId: id },
+      data: { tecnicoId: null }
+    })
+
+    // Delete tecnico record
+    await db.tecnico.delete({
+      where: { id }
+    })
+
+    // Try deleting the user if their role was 'tecnico', fallback to 'cliente'
+    if (tecnico.usuario.rol === 'tecnico') {
+      try {
+        await db.usuario.delete({
+          where: { id: tecnico.usuarioId }
+        })
+      } catch (err) {
+        await db.usuario.update({
+          where: { id: tecnico.usuarioId },
+          data: { rol: 'cliente' }
+        })
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      mensaje: 'Técnico eliminado correctamente'
+    })
+  } catch (error) {
+    console.error('Error en DELETE /api/admin_tecnicos:', error)
+    return NextResponse.json({ success: false, error: 'Error al eliminar técnico' }, { status: 500 })
+  }
+}
