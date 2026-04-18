@@ -234,7 +234,7 @@ export default function AdminTecnicosPage() {
         if (data.success) {
           await fetchTecnicos()
         } else {
-          alert('Error: ' + data.error)
+          alert('Error: ' + data.error + (data.details ? '\nDetalles: ' + data.details : ''))
           setIsLoading(false)
         }
       } catch (error) {

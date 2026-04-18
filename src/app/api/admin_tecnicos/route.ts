@@ -326,7 +326,6 @@ export async function DELETE(req: NextRequest) {
       mensaje: 'Técnico eliminado correctamente'
     })
   } catch (error) {
-    console.error('Error en DELETE /api/admin_tecnicos:', error)
-    return NextResponse.json({ success: false, error: 'Error al eliminar técnico' }, { status: 500 })
+    return NextResponse.json({ success: false, error: 'Error al eliminar técnico', details: error instanceof Error ? error.message : String(error) }, { status: 500 })
   }
 }
