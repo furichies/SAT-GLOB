@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json()
-    const { nombre, apellidos, email, telefono, especialidades, nivel, disponible } = body
+    const { nombre, apellidos, email, telefono, especialidades, nivel, disponible, password } = body
 
     if (!nombre || !email) {
       return NextResponse.json({ success: false, error: 'Nombre y email son obligatorios' }, { status: 400 })
@@ -136,7 +136,8 @@ export async function POST(req: NextRequest) {
       }
     } else {
       // Crear nuevo usuario
-      const passwordHash = await hash('MicroInfo2024!', 12) // Contraseña por defecto
+      const passwordToHash = password && password.trim() !== '' ? password : 'MicroInfo2024!'
+      const passwordHash = await hash(passwordToHash, 12) // Contraseña introducida o por defecto
       usuario = await db.usuario.create({
         data: {
           nombre,
