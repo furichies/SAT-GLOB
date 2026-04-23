@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useAuth, useIsStaff, useIsAdmin } from '@/hooks/use-auth'
 import { Loader2, Lock } from 'lucide-react'
 
@@ -11,12 +11,13 @@ export default function AdminLayout({
     children: React.ReactNode
 }) {
     const router = useRouter()
+    const pathname = usePathname()
     const { isAuthenticated, isLoading: authLoading, user } = useAuth()
     const { hasAnyRole: isStaff, isLoading: roleLoading } = useIsStaff()
     const { hasAnyRole: isAdmin, isLoading: adminRoleLoading } = useIsAdmin()
     const [showRestricted, setShowRestricted] = useState(false)
 
-    const isAdminArea = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin/clientes')
+    const isAdminArea = pathname.startsWith('/admin/clientes')
     const canAccess = isAdminArea ? isAdmin : isStaff
 
     useEffect(() => {
