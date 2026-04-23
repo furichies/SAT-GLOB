@@ -22,7 +22,6 @@ import {
 } from 'lucide-react'
 import { AdminSidebar } from '@/components/admin/AdminSidebar'
 import { toast } from 'sonner'
-import { useSession } from 'next-auth/react'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -38,7 +37,6 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog"
 import Link from 'next/link'
-import { useSession } from 'next-auth/react'
 
 export default function AdminClientesPage() {
     const { data: session } = useSession()
