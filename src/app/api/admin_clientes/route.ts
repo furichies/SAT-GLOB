@@ -126,9 +126,9 @@ export async function DELETE(req: NextRequest) {
 export async function GET(req: NextRequest) {
     try {
         const session = await getServerSession(authOptions)
-        const isAdmin = session?.user?.role === 'admin' || session?.user?.role === 'superadmin'
+        const isAdminOrTecnico = session?.user?.role === 'admin' || session?.user?.role === 'superadmin' || session?.user?.role === 'tecnico'
 
-        if (!session || !isAdmin) {
+        if (!session || !isAdminOrTecnico) {
             return NextResponse.json({ success: false, error: 'No autorizado' }, { status: 401 })
         }
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth, useIsStaff } from '@/hooks/use-auth'
+import { useAuth, useIsStaff, useIsAdmin } from '@/hooks/use-auth'
 import { Loader2, Lock } from 'lucide-react'
 
 export default function AdminLayout({
@@ -13,23 +13,25 @@ export default function AdminLayout({
     const router = useRouter()
     const { isAuthenticated, isLoading: authLoading, user } = useAuth()
     const { hasAnyRole: isStaff, isLoading: roleLoading } = useIsStaff()
+    const { hasAnyRole: isAdmin, isLoading: adminRoleLoading } = useIsAdmin()
     const [showRestricted, setShowRestricted] = useState(false)
 
-    console.log('[AdminLayout] user?.role:', user?.role, 'isStaff:', isStaff, 'authLoading:', authLoading, 'roleLoading:', roleLoading)
+    const isAdminArea = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin/clientes')
+    const canAccess = isAdminArea ? isAdmin : isStaff
 
     useEffect(() => {
-        if (authLoading || roleLoading) return
+        if (authLoading || roleLoading || adminRoleLoading) return
         
         if (!isAuthenticated) {
             router.push('/auth/login')
-        } else if (isAuthenticated && !isStaff) {
+        } else if (isAuthenticated && !canAccess) {
             setShowRestricted(true)
             const timer = setTimeout(() => router.push('/'), 2000)
             return () => clearTimeout(timer)
         }
-    }, [isAuthenticated, isStaff, authLoading, roleLoading, router])
+    }, [isAuthenticated, canAccess, authLoading, roleLoading, adminRoleLoading, router])
 
-    if (authLoading || roleLoading) {
+    if (authLoading || roleLoading || adminRoleLoading) {
         return (
             <div className="flex h-screen w-full items-center justify-center bg-gray-50">
                 <div className="flex flex-col items-center gap-4">
@@ -54,7 +56,7 @@ export default function AdminLayout({
         )
     }
 
-    if (isAuthenticated && isStaff) {
+    if (isAuthenticated && canAccess) {
         return <>{children}</>
     }
 

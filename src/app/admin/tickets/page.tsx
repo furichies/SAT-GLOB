@@ -109,8 +109,13 @@ export default function AdminTicketsPage() {
 
   useEffect(() => {
     fetchTickets()
-    fetchTecnicos()
   }, [])
+
+  useEffect(() => {
+    if (tecnicosList.length === 0) {
+      fetchTecnicos()
+    }
+  }, [tecnicosList.length])
 
   // Efeecto para deep linking desde documento
   useEffect(() => {
@@ -165,8 +170,10 @@ export default function AdminTicketsPage() {
 
   const fetchTecnicos = async () => {
     try {
+      console.log('Fetching tecnicos list...')
       const res = await fetch('/api/admin_tecnicos')
       const data = await res.json()
+      console.log('Tecnicos API response:', data)
       if (data.success) {
         console.log('Técnicos cargados:', data.data.tecnicos)
         setTecnicosList(data.data.tecnicos)

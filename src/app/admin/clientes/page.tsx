@@ -22,6 +22,7 @@ import {
 } from 'lucide-react'
 import { AdminSidebar } from '@/components/admin/AdminSidebar'
 import { toast } from 'sonner'
+import { useSession } from 'next-auth/react'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -37,8 +38,12 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog"
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 
 export default function AdminClientesPage() {
+    const { data: session } = useSession()
+    const isTecnico = session?.user?.role === 'tecnico'
+    const isAdmin = session?.user?.role === 'admin' || session?.user?.role === 'superadmin'
     const [busqueda, setBusqueda] = useState('')
     const [clientes, setClientes] = useState<any[]>([])
     const [isLoading, setIsLoading] = useState(true)
@@ -168,10 +173,12 @@ export default function AdminClientesPage() {
                                 Consulta y administra la información de los usuarios registrados.
                             </p>
                         </div>
-                        <Button onClick={() => setShowNuevoClienteModal(true)} className="gap-2 bg-primary text-white hover:bg-primary/90">
-                            <Plus className="h-4 w-4" />
-                            Nuevo Cliente
-                        </Button>
+                        {isAdmin && (
+                            <Button onClick={() => setShowNuevoClienteModal(true)} className="gap-2 bg-primary text-white hover:bg-primary/90">
+                                <Plus className="h-4 w-4" />
+                                Nuevo Cliente
+                            </Button>
+                        )}
                     </div>
 
                     <div className="bg-white border p-6 rounded-2xl mb-6 shadow-sm">
@@ -285,9 +292,11 @@ export default function AdminClientesPage() {
                                                                     <ShoppingBag className="h-4 w-4" /> Ver Pedidos
                                                                 </Link>
                                                             </DropdownMenuItem>
-                                                            <DropdownMenuItem className="gap-2 text-red-600" onClick={() => handleEliminarCliente(cliente.id, cliente.nombre)}>
-                                                                <Trash className="h-4 w-4" /> Eliminar Cliente
-                                                            </DropdownMenuItem>
+                                                            {isAdmin && (
+                                                                <DropdownMenuItem className="gap-2 text-red-600" onClick={() => handleEliminarCliente(cliente.id, cliente.nombre)}>
+                                                                    <Trash className="h-4 w-4" /> Eliminar Cliente
+                                                                </DropdownMenuItem>
+                                                            )}
                                                         </DropdownMenuContent>
                                                     </DropdownMenu>
                                                 </td>
