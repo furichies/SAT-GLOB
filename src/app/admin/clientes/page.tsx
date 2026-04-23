@@ -37,6 +37,7 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog"
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 
 export default function AdminClientesPage() {
     const { data: session } = useSession()
