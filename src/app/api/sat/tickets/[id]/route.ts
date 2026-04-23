@@ -82,34 +82,34 @@ export async function PATCH(
         const { estado, prioridad, tecnico, tecnicoId: bodyTecnicoId, tipo, descripcion, asunto, diagnostico, solucion } = body
         const { id } = await params
 
-        let tecnicoId: string | null | undefined = undefined
+let tecnicoId: string | null | undefined = undefined
 
         // Prioritize explicit tecnicoId if provided (including empty string to unassign)
-        if (bodyTecnicoId !== undefined) {
-            tecnicoId = bodyTecnicoId === 'Sin asignar' || bodyTecnicoId === '' ? null : bodyTecnicoId
+        if (bodyTecnicoId !== undefined && bodyTecnicoId !== null) {
+          tecnicoId = bodyTecnicoId === 'Sin asignar' || bodyTecnicoId === '' ? null : bodyTecnicoId
         } else if (tecnico === 'Sin asignar') {
-            tecnicoId = null
+          tecnicoId = null
         } else if (tecnico) {
-            // FALLBACK: Buscar técnico por nombre completo o parcial (Legacy/Fallback)
-            const techRecord = await db.tecnico.findFirst({
-                where: {
-                    OR: [
-                        { usuario: { nombre: { contains: tecnico } } },
-                        { usuario: { apellidos: { contains: tecnico } } },
-                        {
-                            usuario: {
-                                AND: [
-                                    { nombre: { contains: tecnico.split(' ')[0] } },
-                                    { apellidos: { contains: tecnico.split(' ').slice(1).join(' ') } }
-                                ]
-                            }
-                        }
+          // FALLBACK: Buscar técnico por nombre completo o parcial (Legacy/Fallback)
+          const techRecord = await db.tecnico.findFirst({
+            where: {
+              OR: [
+                { usuario: { nombre: { contains: tecnico } } },
+                { usuario: { apellidos: { contains: tecnico } } },
+                {
+                  usuario: {
+                    AND: [
+                      { nombre: { contains: tecnico.split(' ')[0] } },
+                      { apellidos: { contains: tecnico.split(' ').slice(1).join(' ') } }
                     ]
+                  }
                 }
-            })
-            if (techRecord) {
-                tecnicoId = techRecord.id
+              ]
             }
+          })
+          if (techRecord) {
+            tecnicoId = techRecord.id
+          }
         }
         const updated = await db.ticket.update({
             where: { id },
